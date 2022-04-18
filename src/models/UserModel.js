@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
-    Email:{
+    email:{
         type:String,
         required:[true, 'Email is required..'],
         unique: [true, 'Email must be unique..'],
@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema({
             }
         },
     },
-    Password:{
+    password:{
         type:String
     },
     tokens:[
@@ -42,11 +42,39 @@ userSchema.methods.generateAuthToken = async function () {
 userSchema.pre('save', async function (next) {
     const user = this;
  
-    if (user.isModified('Password')) {
-        user.Password = await bcrypt.hash(user.Password, 8);
+    if (user.isModified('password')) {
+        user.password = await bcrypt.hash(user.password, 8);
     }
     
     next();
 });
 
-module.exports = mongoose.model('User',userSchema,'User');
+// Login Validation
+userSchema.statics.findByCredentials = async (email, password) => {
+
+    const user = await User.findOne({ email });
+ 
+    if (!user) {
+        throw new Error('Unable to login..');
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password)
+
+    if (!isMatch) {
+        throw new Error('Unable to login..');
+    }
+
+    return user;
+}
+
+// Get Necessary Parameter
+userSchema.methods.getPublicProfile = async function () {
+    const user = this;
+    const userObject = user.toObject();
+    delete userObject.password;
+    return userObject;
+}
+
+const User = mongoose.model('User',userSchema,'User');
+
+module.exports = User;
