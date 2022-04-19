@@ -4,9 +4,9 @@ const jwt = require("jsonwebtoken");
 const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
-    email:{
-        type:String,
-        required:[true, 'Email is required..'],
+    email: {
+        type: String,
+        required: [true, 'Email is required..'],
         unique: [true, 'Email must be unique..'],
         validate(value) {
             if (!validator.isEmail(value)) {
@@ -14,18 +14,22 @@ const userSchema = new mongoose.Schema({
             }
         },
     },
-    password:{
-        type:String
+    password: {
+        type: String
     },
-    tokens:[
+    image: {
+        type:String,
+        required:true
+    },
+    tokens: [
         {
-            token:{
-                type:String,
-                required:true
+            token: {
+                type: String,
+                required: true
             }
         }
     ]
-},{ timestamps: true });
+}, { timestamps: true });
 
 // Generate AuthToken And Save Methods
 userSchema.methods.generateAuthToken = async function () {
@@ -41,11 +45,11 @@ userSchema.methods.generateAuthToken = async function () {
 // Middleware Before Saving Data To Hash Password
 userSchema.pre('save', async function (next) {
     const user = this;
- 
+
     if (user.isModified('password')) {
         user.password = await bcrypt.hash(user.password, 8);
     }
-    
+
     next();
 });
 
@@ -53,7 +57,7 @@ userSchema.pre('save', async function (next) {
 userSchema.statics.findByCredentials = async (email, password) => {
 
     const user = await User.findOne({ email });
- 
+
     if (!user) {
         throw new Error('Unable to login..');
     }
@@ -75,6 +79,6 @@ userSchema.methods.getPublicProfile = async function () {
     return userObject;
 }
 
-const User = mongoose.model('User',userSchema,'User');
+const User = mongoose.model('User', userSchema, 'User');
 
 module.exports = User;
