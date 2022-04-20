@@ -5,6 +5,9 @@ const cloudinary = require('cloudinary');
 const PostModel = require('../models/PostModel');
 const TopicModel = require('../models/TopicModel');
 
+// Util
+const { checkParameters } = require('../middleware/utils');
+
 // API Using Async Await
 
 // Create New Post
@@ -53,12 +56,9 @@ exports.CreatePost = async (req, res) => {
 // Update Post
 exports.UpdatePost = async (req, res) => {
     try {
-        const updates = Object.keys(req.body);
-        const allowedUpdates = ['postname', 'status', 'topicid'];
-        const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
-        if (!isValidOperation) {
-            return res.status(400).send({ error: 'Invalid Updates!' });
+        if (!checkParameters(req.body, ['postname', 'status', 'topicid'])) {
+            return res.status(400).send({ error: 'Invalid Parameters..' });
         }
 
         // Check Topic If Topic Is Changed
@@ -76,7 +76,8 @@ exports.UpdatePost = async (req, res) => {
 
         if (!data)
             return res.status(404).send({ error: "Not Found.." });
-        updates.forEach((update) => {
+
+        Object.keys(req.body).forEach((update) => {
             data[update] = req.body[update];
         });
 

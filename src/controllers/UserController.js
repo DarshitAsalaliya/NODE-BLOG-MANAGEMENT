@@ -4,6 +4,9 @@ const cloudinary = require('cloudinary');
 // Model
 const UserModel = require('../models/UserModel');
 
+// Util
+const { checkParameters } = require('../middleware/utils');
+
 // API Using Async Await
 
 // Registration
@@ -37,11 +40,8 @@ exports.Registration = async (req, res) => {
 // Login GenerateToken
 exports.Login = async (req, res) => {
     try {
-        const updates = Object.keys(req.body);
-        const allowedUpdates = ['email', 'password'];
-        const isValidOperation = updates.every((update) => allowedUpdates.includes(update));
 
-        if (!isValidOperation) {
+        if (!checkParameters(req.body,['email', 'password'])) {
             return res.status(400).send({ error: 'Invalid Parameters..' });
         }
 
