@@ -8,9 +8,9 @@ exports.CreateTopic = async (req, res) => {
     try {
         const newTopic = new TopicModel({ ...req.body, userid: req.user._id });
         await newTopic.save();
-        res.status(201).send(newTopic);
+        return res.status(201).send(newTopic);
     } catch (e) {
-        res.status(400).send({ msg: e.message });
+        return res.status(400).send({ error: e.message });
     }
 }
 
@@ -21,11 +21,11 @@ exports.GetAllTopic = async (req, res) => {
 
         // Check Topic Length
         if (topicList.length === 0) {
-            return res.status(404).send({ msg: "Topic not found.." });
+            return res.status(404).send({ error: "Topic not found.." });
         }
 
         res.status(200).send(topicList);
     } catch (e) {
-        res.status(400).send(e);
+        res.status(400).send({ error: e.message });
     }
 }
