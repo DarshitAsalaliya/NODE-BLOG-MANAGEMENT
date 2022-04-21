@@ -4,6 +4,7 @@ const PostSchema = new mongoose.Schema({
     postname: {
         type: String,
         required: [true, 'Post name is required..'],
+        minlength: [3, 'Your post name must be longer than 2 characters'],
         trim: true
     },
     status: {
