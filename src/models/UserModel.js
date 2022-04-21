@@ -17,10 +17,18 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String
     },
-    image: {
-        type:String,
-        required:true
-    },
+    image: [
+        {
+            public_id: {
+                type: String,
+                required: true
+            },
+            image_url: {
+                type: String,
+                required: true
+            }
+        }
+    ],
     tokens: [
         {
             token: {
@@ -63,7 +71,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
     }
 
     const isMatch = await bcrypt.compare(password, user.password)
-   
+
     if (!isMatch) {
         throw new Error('Unable to login..');
     }

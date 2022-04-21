@@ -48,10 +48,18 @@ const PostSchema = new mongoose.Schema({
             }
         }
     ],
-    images: {
-        type: Array,
-        required: true
-    },
+    images: [
+        {
+            public_id: {
+                type: String,
+                required: true
+            },
+            image_url: {
+                type: String,
+                required: true
+            }
+        }
+    ],
     topicid: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,

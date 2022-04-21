@@ -16,9 +16,6 @@ exports.CreatePost = async (req, res) => {
         const findTopic = await TopicModel.findById(req.body.topicid);
         if (findTopic) {
 
-            const newPost = new PostModel({ ...req.body, userid: req.user._id, images: req.files.map((data) => data.filename) });
-            await newPost.save();
-
             //Map through images and create a promise array using cloudinary upload function
             let multiplePicturePromise = req.files.map((data) => {
                 return cloudinary.v2.uploader.upload(data.path, {
@@ -37,6 +34,9 @@ exports.CreatePost = async (req, res) => {
             // Await all the cloudinary upload functions in promise.all
             let imageResponses = await Promise.all(multiplePicturePromise);
 
+            const newPost = new PostModel({ ...req.body, userid: req.user._id, images: imageResponses.map((data) => { return { public_id: data.public_id, image_url: data.secure_url } }) });
+            await newPost.save();
+
             return res.status(201).send(newPost);
         }
         else {
@@ -48,6 +48,16 @@ exports.CreatePost = async (req, res) => {
         req.files.forEach((data) => {
             fs.unlink('./public/postimages/' + data.filename, (err) => { });
         });
+
+        // Delete Uploaded File From Cloudinary        
+        //Map through images and create a promise array using cloudinary upload function
+        let deleteMultiplePicturePromise = req.files.map((data) => {
+            return cloudinary.v2.uploader.destroy('postimages/' + data.filename);
+        }
+        );
+
+        // Await all the cloudinary upload functions in promise.all
+        let imageResponses = await Promise.all(deleteMultiplePicturePromise);
 
         res.status(400).send({ error: e.message });
     }

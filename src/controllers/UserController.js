@@ -13,26 +13,31 @@ const { checkParameters } = require('../middleware/utils');
 exports.Registration = async (req, res) => {
     try {
 
-        const newUser = new UserModel({ ...req.body, image: req.file.filename });
-        await newUser.save();
-        const token = await newUser.generateAuthToken();
-
         // Upload Image To Cloudinary
         const uploadResult = await cloudinary.v2.uploader.upload(req.file.path, {
             folder: 'userimages',
             public_id: req.file.filename,
             crop: "fit",
             allowedFormats: ['jpg', 'jpeg', 'png']
-        }, (err) => {
-            if (err) {
-                throw new Error(err.message);
+        }, (e) => {
+            if (e) {
+                throw new Error(e.message);
             }
         });
+
+        // Save User
+        const newUser = new UserModel({ ...req.body, image: { public_id: uploadResult.public_id, image_url: uploadResult.secure_url } });
+        await newUser.save();
+        const token = await newUser.generateAuthToken();
 
         res.status(201).send({ newUser, token });
     } catch (e) {
         // Delete Uploaded File
         fs.unlink('./public/userimages/' + req.file.filename, (err) => { });
+
+        // Delete Uploaded File From Cloudinary
+        await cloudinary.v2.uploader.destroy('userimages/' + req.file.filename);
+
         res.status(400).send({ error: e.message });
     }
 }
@@ -41,7 +46,7 @@ exports.Registration = async (req, res) => {
 exports.Login = async (req, res) => {
     try {
 
-        if (!checkParameters(req.body,['email', 'password'])) {
+        if (!checkParameters(req.body, ['email', 'password'])) {
             return res.status(400).send({ error: 'Invalid Parameters..' });
         }
 
