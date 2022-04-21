@@ -59,7 +59,7 @@ exports.CreatePost = async (req, res) => {
         // Await all the cloudinary upload functions in promise.all
         let imageResponses = await Promise.all(deleteMultiplePicturePromise);
 
-        res.status(400).send({ error: e.message });
+        return res.status(400).send({ error: e.message });
     }
 }
 
@@ -93,10 +93,10 @@ exports.UpdatePost = async (req, res) => {
 
         await data.save();
 
-        res.status(200).send(data);
+        return res.status(200).send(data);
 
     } catch (e) {
-        res.status(400).send({ error: e.message });
+        return res.status(400).send({ error: e.message });
     }
 }
 
@@ -123,10 +123,10 @@ exports.DeletePost = async (req, res) => {
             fs.unlink('./public/postimages/' + filename, (err) => { });
         });
 
-        res.status(200).send(data);
+        return res.status(200).send(data);
     }
     catch (e) {
-        res.status(400).send({ error: e.message });
+        return res.status(400).send({ error: e.message });
     }
 }
 
@@ -140,9 +140,9 @@ exports.GetAllPost = async (req, res) => {
             return res.status(404).send({ error: "Post not found.." });
         }
 
-        res.status(200).send(PostList);
+        return res.status(200).send(PostList);
     } catch (e) {
-        res.status(400).send({ error: e.message });
+        return res.status(400).send({ error: e.message });
     }
 }
 
@@ -156,9 +156,9 @@ exports.GetPostByTopic = async (req, res) => {
             return res.status(404).send({ error: "Post not found.." });
         }
 
-        res.status(200).send(PostList);
+        return res.status(200).send(PostList);
     } catch (e) {
-        res.status(400).send({ error: e.message });
+        return res.status(400).send({ error: e.message });
     }
 }
 
@@ -172,9 +172,9 @@ exports.GetRecentPost = async (req, res) => {
             return res.status(404).send({ error: "Post not found.." });
         }
 
-        res.status(200).send(PostList);
+        return res.status(200).send(PostList);
     } catch (e) {
-        res.status(400).send({ error: e.message });
+        return res.status(400).send({ error: e.message });
     }
 }
 
@@ -274,8 +274,8 @@ exports.AddPostComment = async (req, res) => {
         Post.comments = Post.comments.concat({ comment: req.body.comment, userid: req.user._id });
         await Post.save();
 
-        res.status(200).send(Post);
+        return res.status(200).send(Post);
     } catch (e) {
-        res.status(400).send({ error: e.message });
+        return res.status(400).send({ error: e.message });
     }
 }

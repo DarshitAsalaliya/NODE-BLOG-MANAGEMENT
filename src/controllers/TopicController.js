@@ -24,8 +24,8 @@ exports.GetAllTopic = async (req, res) => {
             return res.status(404).send({ error: "Topic not found.." });
         }
 
-        res.status(200).send(topicList);
+        return res.status(200).send(topicList);
     } catch (e) {
-        res.status(400).send({ error: e.message });
+        return res.status(400).send({ error: e.message });
     }
 }

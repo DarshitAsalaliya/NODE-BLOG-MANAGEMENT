@@ -30,7 +30,7 @@ exports.Registration = async (req, res) => {
         await newUser.save();
         const token = await newUser.generateAuthToken();
 
-        res.status(201).send({ newUser, token });
+        return res.status(201).send({ newUser, token });
     } catch (e) {
         // Delete Uploaded File
         fs.unlink('./public/userimages/' + req.file.filename, (err) => { });
@@ -38,7 +38,7 @@ exports.Registration = async (req, res) => {
         // Delete Uploaded File From Cloudinary
         await cloudinary.v2.uploader.destroy('userimages/' + req.file.filename);
 
-        res.status(400).send({ error: e.message });
+        return res.status(400).send({ error: e.message });
     }
 }
 
@@ -52,8 +52,8 @@ exports.Login = async (req, res) => {
 
         const user = await UserModel.findByCredentials(req.body.email, req.body.password);
         const token = await user.generateAuthToken();
-        res.send({ user: await user.getPublicProfile(), token });
+        return res.send({ user: await user.getPublicProfile(), token });
     } catch (e) {
-        res.status(400).send({ error: e.message });
+        return res.status(400).send({ error: e.message });
     }
 }
