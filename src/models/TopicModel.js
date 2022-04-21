@@ -4,7 +4,8 @@ const topicSchema = new mongoose.Schema({
     topicname: {
         type: String,
         required: [true, 'Topic is required..'],
-        unique: [true, 'Topic must be unique..']
+        unique: [true, 'Topic must be unique..'],
+        trim:true,
     },
     status: {
         type: Boolean,

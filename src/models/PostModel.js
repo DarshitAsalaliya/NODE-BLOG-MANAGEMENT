@@ -4,6 +4,7 @@ const PostSchema = new mongoose.Schema({
     postname: {
         type: String,
         required: [true, 'Post name is required..'],
+        trim: true
     },
     status: {
         type: Boolean,

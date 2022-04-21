@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Email is required..'],
         unique: [true, 'Email must be unique..'],
+        trim: true,
         validate(value) {
             if (!validator.isEmail(value)) {
                 throw new Error('Invalid email..');
@@ -17,18 +18,16 @@ const userSchema = new mongoose.Schema({
     password: {
         type: String
     },
-    image: [
-        {
-            public_id: {
-                type: String,
-                required: true
-            },
-            image_url: {
-                type: String,
-                required: true
-            }
+    image: {
+        public_id: {
+            type: String,
+            required: true
+        },
+        image_url: {
+            type: String,
+            required: true
         }
-    ],
+    },
     tokens: [
         {
             token: {

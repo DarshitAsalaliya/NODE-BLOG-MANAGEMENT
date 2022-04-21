@@ -110,8 +110,8 @@ exports.DeletePost = async (req, res) => {
         }
 
         //Map through images and create a promise array using cloudinary upload function
-        let multiplePicturePromise = data.images.map((filename) => {
-            return cloudinary.v2.uploader.destroy('postimages/' + filename);
+        let multiplePicturePromise = data.images.map((d) => {
+            return cloudinary.v2.uploader.destroy(d.public_id);
         }
         );
 
@@ -119,8 +119,8 @@ exports.DeletePost = async (req, res) => {
         let imageResponses = await Promise.all(multiplePicturePromise);
 
         // Delete Uploaded Files From Local Folder
-        data.images.forEach((filename) => {
-            fs.unlink('./public/postimages/' + filename, (err) => { });
+        data.images.forEach((d) => {
+            fs.unlink('./public/' + d.public_id, (err) => { });
         });
 
         return res.status(200).send(data);
